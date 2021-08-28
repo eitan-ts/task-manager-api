@@ -19,7 +19,10 @@ const upload = multer({
     }
 })
 
-
+router.get('/users', async (req, res) => {
+    const users = await User.find({})
+    res.send(users)
+})
 
 router.post('/users/signup' , async (req, res) => {
     
@@ -29,19 +32,24 @@ router.post('/users/signup' , async (req, res) => {
         const token = await user.generateAuthToken()
         res.status(201).send({user,token})
     } catch (err) {
-        res.status(400).send()
+        res.status(400).send(err)
     }
 })
 
 router.post('/users/login', async (req, res) => {
     
+    if(!req.body.email || !req.body.password) {
+        res.status(400).send('Please provide an email and password')
+    }
+
     try{
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
         res.send({ user, token })
         
     }catch(e){
-        res.status(400).send()
+        console.log()
+        res.status(400).send(e.message)
     }
 })
 
@@ -52,7 +60,7 @@ router.post('/users/logout', auth , async(req,res) => {
 
         res.send()
     }catch(e){
-        res.status(500).send
+        res.status(500).send(e)
     }
 })
 

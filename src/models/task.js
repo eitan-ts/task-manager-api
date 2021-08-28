@@ -6,7 +6,10 @@ const taskSchema = mongoose.Schema({
         required: true,
         trim: true
     },
-    completed:{
+    day:{
+        type: Date,
+    },
+    reminder:{
         type: Boolean,
         default: false
     },
@@ -18,6 +21,7 @@ const taskSchema = mongoose.Schema({
 },{
     timestamps: true
 })
+
 
 const Task = mongoose.model('Task',taskSchema)
 

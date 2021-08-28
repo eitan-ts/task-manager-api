@@ -6,22 +6,13 @@ const Task = require('./task')
 
 
 const userSchema = new mongoose.Schema({
-    name: {
+    username: {
         type: String,
-        required: true,
         trim: true
-    },
-    age:{
-        type: Number,
-        default: 0,
-        validate(value){
-            if(value < 0)
-                throw new Error('Age must be positive number')
-        }
     },
     password:{
         type: String,
-        required: true,
+        required: [true, 'Please enter a password'],
         minlength: 7,
         trim: true,
         validate(value){
@@ -32,13 +23,13 @@ const userSchema = new mongoose.Schema({
     },
     email:{
         type : String,
-        required: true,
+        required: [true,'Please enter a valid email address'],
         unique: true,
         trim: true,
         lowercase: true,
         validate(value){
             if(!validator.isEmail(value)){
-                throw new Error('Email is invalied')
+                throw new Error('Please provide a valid email address')
             }
         }
     },
@@ -50,7 +41,9 @@ const userSchema = new mongoose.Schema({
     }],
     avatar:{
         type: Buffer
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
 },{
     timestamps: true
 })
@@ -72,7 +65,9 @@ userSchema.methods.toJSON = function(){
 }
 userSchema.methods.generateAuthToken = async function(){
     const user = this
-    const token =  jwt.sign({_id:user._id.toString() }, process.env.JWT_SECRET)
+    const token =  jwt.sign({_id:user._id.toString() }, process.env.JWT_SECRET, {
+        expiresIn: process.env.JWT_EXPIRE,
+    })
 
     user.tokens = user.tokens.concat({ token })
     await user.save()
