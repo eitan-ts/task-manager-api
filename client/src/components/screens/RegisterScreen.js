@@ -3,10 +3,7 @@ import { Link} from 'react-router-dom'
 import axios from 'axios'
 import { isEmail } from 'validator'
 
-const baseURL='http://localhost:5000/'
-const api = axios.create({
-    baseURL 
-  })
+
 
 const RegisterScreen = ({ history }) => {
     const [name,setName] = useState('')
@@ -48,7 +45,7 @@ const RegisterScreen = ({ history }) => {
         }
 
         try{
-            const { data } = await api.post('/users/signup',{ name, email, password },config)
+            const { data } = await axios.post('/api/users/signup',{ name, email, password },config)
             localStorage.setItem('authToken', data.token)
             history.push('/')
         }catch(err){

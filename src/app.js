@@ -1,7 +1,8 @@
 const express = require('express')
 require('./db/mongoose')
-const userRouter = require('./routers/user_router')
-const taskRouter = require('./routers/task_router')
+const userRouter = require('./routers/api/user_router')
+const taskRouter = require('./routers/api/task_router')
+const path = require("path");
 
 
 const app = express()
@@ -14,12 +15,12 @@ app.use((req, res, next) => {
   });
 
 app.use(express.json())
-app.use(userRouter)
-app.use(taskRouter)
+app.use('/api/users',userRouter)
+app.use('/api/tasks/',taskRouter)
 
-if(process.env.NODE_ENV === 'production'){
-   app.use(express.static('../client/build'))
-}
-
+app.use(express.static(path.resolve(__dirname, "../client/build")));
+app.get("*", function (request, response) {
+  response.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
+});
 
 module.exports = app

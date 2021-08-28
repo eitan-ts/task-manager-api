@@ -2,10 +2,6 @@ import { useState, useEffect } from "react"
 import { Link} from 'react-router-dom'
 import axios from 'axios'
 
-const baseURL='http://localhost:5000/'
-const api = axios.create({
-    baseURL 
-  })
 
 const LoginScreen = ({ history }) => {
     const [email, setEmail] = useState('')
@@ -29,7 +25,7 @@ const LoginScreen = ({ history }) => {
 
 
         try{
-            const { data } = await api.post('/users/login',{  email, password }, config)
+            const { data } = await axios.post('/api/users/login',{  email, password }, config)
             localStorage.setItem('authToken', data.token)
             history.push('/')
         }catch(err){

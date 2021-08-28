@@ -1,9 +1,9 @@
 const express = require('express')
 const multer = require('multer')
 const sharp = require('sharp')
-const User = require('../models/user')
-const{ sendWelcomeEmail, sendCancelEmail } = require('../emails/accounts')
-const auth = require('../middleware/auth')
+const User = require('../../models/user')
+const{ sendWelcomeEmail, sendCancelEmail } = require('../../emails/accounts')
+const auth = require('../../middleware/auth')
 
 
 
@@ -19,12 +19,12 @@ const upload = multer({
     }
 })
 
-router.get('/users', async (req, res) => {
+router.get('/', async (req, res) => {
     const users = await User.find({})
     res.send(users)
 })
 
-router.post('/users/signup' , async (req, res) => {
+router.post('/signup' , async (req, res) => {
     
     try {
         const user = new User(req.body)
@@ -36,7 +36,7 @@ router.post('/users/signup' , async (req, res) => {
     }
 })
 
-router.post('/users/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     
     if(!req.body.email || !req.body.password) {
         res.status(400).send('Please provide an email and password')
@@ -53,7 +53,7 @@ router.post('/users/login', async (req, res) => {
     }
 })
 
-router.post('/users/logout', auth , async(req,res) => {
+router.post('/logout', auth , async(req,res) => {
     try{
         req.user.tokens = req.user.tokens.filter((token) => token.token !== req.token)
         await req.user.save()
@@ -64,7 +64,7 @@ router.post('/users/logout', auth , async(req,res) => {
     }
 })
 
-router.post('/users/logoutAll', auth , async(req,res) => {
+router.post('/logoutAll', auth , async(req,res) => {
     try{
         req.user.tokens = []
         await req.user.save()
@@ -75,12 +75,12 @@ router.post('/users/logoutAll', auth , async(req,res) => {
     }
 })
 
-router.get('/users/me',auth, async (req, res) => {
+router.get('/me',auth, async (req, res) => {
     res.send(req.user)
 })
 // ? ':id' is called "route parameters"
 
-router.patch('/users/me', auth, async (req, res) => {
+router.patch('/me', auth, async (req, res) => {
     const updates = Object.keys(req.body) // ? Update fields sent from the client.
     const allowedUpdates = ['name', 'email', 'password', 'age'] // ? List of allowed updates.
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update)) // ? Check for each update sent by user if is contained in the allowed updates.
@@ -102,7 +102,7 @@ router.patch('/users/me', auth, async (req, res) => {
     }
 })
 
-router.delete('/users/me',auth, async (req, res) => {
+router.delete('/me',auth, async (req, res) => {
     try {
         await req.user.remove()
         await sendCancelEmail(req.user.email, req.user.name)
@@ -111,7 +111,7 @@ router.delete('/users/me',auth, async (req, res) => {
         res.status(500).send()
     }
 })
-router.get('/users/:id/avatar', async (req,res) => {
+router.get('/:id/avatar', async (req,res) => {
     try{
         const user = await User.findById(req.params.id)
 
@@ -127,7 +127,7 @@ router.get('/users/:id/avatar', async (req,res) => {
     }
 })
 
-router.post('/users/me/avatar', auth, upload.single('avatar'), async (req,res) =>{
+router.post('/me/avatar', auth, upload.single('avatar'), async (req,res) =>{
     const buffer = await sharp(req.file.buffer).resize(({ width: 250, height: 250})).png().toBuffer()
     req.user.avatar = buffer
     await req.user.save()
@@ -136,7 +136,7 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req,res) =
     res.status(400).send({error: error.message})
 })
 
-router.delete('/users/me/avatar',auth, async (req,res) => {
+router.delete('/me/avatar',auth, async (req,res) => {
     if(req.user.avatar){
         req.user.avatar = undefined
          await req.user.save()

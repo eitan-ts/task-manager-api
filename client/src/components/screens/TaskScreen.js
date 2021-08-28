@@ -6,11 +6,6 @@ import AddTask from '../../components/AddTask'
 import ErrorScreen from './ErrorScreen'
 import Button from '../../components/Button'
 
-const baseURL='http://localhost:5000/'
-const api = axios.create({
-    baseURL 
-  })
-
   const config = {
     headers:{
       Authorization: `Bearer ${localStorage.getItem("authToken")}`
@@ -42,7 +37,7 @@ const TaskScreen = ({ history } ) => {
     const fetchPrivateTasks = async () =>{
         
         try{
-            const { data } = await api.get('/tasks', config)
+            const { data } = await axios.get('/api/tasks/', config)
             setTasks(data)
         }catch(err){
             localStorage.removeItem("authToken")
@@ -63,19 +58,19 @@ const TaskScreen = ({ history } ) => {
  
   // Add Task 
   const addTask = async (data)=> {
-    await api.post('/tasks',{...data},config)
+    await axios.post('/api/tasks',{...data},config)
     setTaskFlag(true)
   }
 
   // Delete Task
     const deleteTask = async (id) => {
-      await api.delete(`/tasks/${id}`,config)
+      await axios.delete(`/api/tasks/${id}`,config)
       setTaskFlag(true)
     }
 
   // Toggle reminder
     const toggleReminder = async (id, reminder) => {
-      await api.patch(`/tasks/${id}`,{'reminder': !reminder},config)
+      await axios.patch(`/api/tasks/${id}`,{'reminder': !reminder},config)
       setTaskFlag(true)
     }  
 
