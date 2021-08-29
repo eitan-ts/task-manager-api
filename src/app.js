@@ -1,8 +1,8 @@
 const express = require('express')
-require('./db/mongoose')
 const userRouter = require('./routers/api/user_router')
 const taskRouter = require('./routers/api/task_router')
 const path = require("path");
+require('./db/mongoose')
 
 
 const app = express()
@@ -18,9 +18,16 @@ app.use(express.json())
 app.use('/api/users',userRouter)
 app.use('/api/tasks/',taskRouter)
 
-app.use(express.static(path.resolve(__dirname, "../client/build")));
-app.get("*", function (request, response) {
-  response.sendFile(path.resolve(__dirname, "../client/build", "index.html"));
-});
+
+if(process.env.NODE_ENV === "production"){
+  app.use(express.static(path.resolve(__dirname, "../client/build")))
+  app.get("*", (request, response) => {
+    response.sendFile(path.resolve(__dirname, "../client/build", "index.html"))
+  })
+}else{
+  app.get("/",(request, response) => {
+    response.send('API is running!')
+  })
+}
 
 module.exports = app
