@@ -28,17 +28,12 @@ router.post('/signup' , async (req, res) => {
     
     try {
         const user = new User(req.body)
-        if(!user){
-            throw new Error('1')
-        }
-         await sendWelcomeEmail(user.email, user.name)
+        await sendWelcomeEmail(user.email, user.name)
         const token = await user.generateAuthToken()
-        if(!token){
-            throw new Error('2')
-        }
         res.status(201).send({user,token})
     } catch (err) {
-        res.status(402).send(err)
+
+        res.status(400).send({user,token})
     }
 })
 
