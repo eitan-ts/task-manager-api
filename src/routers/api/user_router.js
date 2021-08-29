@@ -38,7 +38,7 @@ router.post('/signup' , async (req, res) => {
         }
         res.status(201).send({user,token})
     } catch (err) {
-        res.status(400).send(console.log(err))
+        res.status(402).send(err)
     }
 })
 
